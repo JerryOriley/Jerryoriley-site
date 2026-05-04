@@ -120,10 +120,6 @@ export default function App() {
               from a DEV environment before release
             </li>
             <li>
-              Saved a critical release when OKTA policy changes broke authentication, helping
-              rebuild and validate a working solution overnight
-            </li>
-            <li>
               Led QA validation for data center migrations across applications, ensuring stable cutovers
             </li>
             <li>
