@@ -84,12 +84,6 @@ export default function App() {
       rotate: "-1.5deg",
     },
     {
-      title: "Communication",
-      text: "Builds trust across QA, development, product, and business teams through clear, tactful communication.",
-      color: "#bfdbfe",
-      rotate: "1deg",
-    },
-    {
       title: "Test Planning",
       text: "Turns unclear requirements into structured, testable, and executable validation paths.",
       color: "#bbf7d0",
