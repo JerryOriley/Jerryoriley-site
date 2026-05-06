@@ -1,12 +1,18 @@
+import { useState } from "react";
+
 export default function App() {
+  const [hoveredCard, setHoveredCard] = useState({ title: null, x: 0, y: 0 });
+
   const styles = {
     page: {
+      position: "relative",
       minHeight: "100vh",
       fontFamily: "Arial, sans-serif",
       background:
         "radial-gradient(circle at top left, rgba(56,189,248,0.18), transparent 30%), linear-gradient(135deg, #0f172a, #111827, #1e293b)",
       color: "#f8fafc",
       padding: "60px 24px",
+      overflow: "hidden",
     },
     container: { maxWidth: "1120px", margin: "0 auto" },
     hero: {
@@ -40,12 +46,16 @@ export default function App() {
     },
     note: {
       padding: "24px",
-      borderRadius: "8px",
+      borderRadius: "18px",
       minHeight: "150px",
       color: "#172033",
       boxShadow: "0 18px 40px rgba(0,0,0,0.28)",
+      transition: "transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease",
       transform: "rotate(-1deg)",
-      border: "1px solid rgba(0,0,0,0.08)",
+      border: "1px solid rgba(255,255,255,0.12)",
+      backdropFilter: "blur(12px)",
+      cursor: "pointer",
+      overflow: "hidden",
     },
     noteTitle: {
       fontSize: "19px",
@@ -75,6 +85,32 @@ export default function App() {
     },
     link: { color: "#7dd3fc", fontWeight: "bold" },
   };
+
+  const getCardStyle = (skill) => {
+    const active = hoveredCard.title === skill.title;
+    const rotateX = active ? hoveredCard.y * 18 : 0;
+    const rotateY = active ? hoveredCard.x * 18 : 0;
+
+    return {
+      ...styles.note,
+      background: `radial-gradient(circle at top left, rgba(255,255,255,0.22), transparent 28%), ${skill.color}`,
+      transform: `perspective(900px) rotate(${skill.rotate}) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
+      boxShadow: active
+        ? "0 35px 110px rgba(15, 23, 42, 0.42)"
+        : "0 18px 40px rgba(0,0,0,0.28)",
+      filter: active ? "saturate(1.05)" : "none",
+    };
+  };
+
+  const handleCardMove = (event, title) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = (event.clientX - rect.left - rect.width / 2) / rect.width;
+    const y = (event.clientY - rect.top - rect.height / 2) / rect.height;
+
+    setHoveredCard({ title, x, y });
+  };
+
+  const resetCard = () => setHoveredCard({ title: null, x: 0, y: 0 });
 
   const skills = [
     {
@@ -127,7 +163,9 @@ export default function App() {
   return (
     <main style={styles.page}>
       <div style={styles.container}>
-        <section style={styles.hero}>
+        <section style={styles.hero} className="hero-section">
+          <div className="hero-glow" aria-hidden="true" />
+          <div className="hero-ring" aria-hidden="true" />
           <div style={styles.badge}>Senior QA Engineer · Release Quality · FinTech · Telecom</div>
 
           <h1 style={styles.title}>Jerry O'Riley</h1>
@@ -147,11 +185,10 @@ export default function App() {
           {skills.map((skill) => (
             <div
               key={skill.title}
-              style={{
-                ...styles.note,
-                background: skill.color,
-                transform: `rotate(${skill.rotate})`,
-              }}
+              style={getCardStyle(skill)}
+              className="interactive-card"
+              onMouseMove={(event) => handleCardMove(event, skill.title)}
+              onMouseLeave={resetCard}
             >
               <div style={styles.noteTitle}>{skill.title}</div>
               <div style={styles.noteText}>{skill.text}</div>
@@ -177,11 +214,10 @@ export default function App() {
             {wins.map((win) => (
               <div
                 key={win.title}
-                style={{
-                  ...styles.note,
-                  background: win.color,
-                  transform: `rotate(${win.rotate})`,
-                }}
+                style={getCardStyle(win)}
+                className="interactive-card"
+                onMouseMove={(event) => handleCardMove(event, win.title)}
+                onMouseLeave={resetCard}
               >
                 <div style={styles.noteTitle}>{win.title}</div>
                 <div style={styles.noteText}>{win.text}</div>
