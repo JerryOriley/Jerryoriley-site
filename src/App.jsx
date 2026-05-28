@@ -77,6 +77,22 @@ export default function App() {
     },
     sectionTitle: { fontSize: "32px", marginBottom: "16px" },
     list: { paddingLeft: "20px", lineHeight: "1.75", color: "#cbd5e1" },
+    toolGrid: {
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+      gap: "14px",
+      marginTop: "20px",
+    },
+    toolPill: {
+      padding: "14px 16px",
+      borderRadius: "14px",
+      background: "rgba(255,255,255,0.08)",
+      border: "1px solid rgba(255,255,255,0.14)",
+      color: "#e2e8f0",
+      fontSize: "15px",
+      fontWeight: "700",
+      textAlign: "center",
+    },
     winGrid: {
       display: "grid",
       gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
@@ -160,6 +176,21 @@ export default function App() {
     },
   ];
 
+  const tools = [
+    "API Testing",
+    "Postman",
+    "Swagger / OpenAPI",
+    "SQL Validation",
+    "Payments & ACH",
+    "Gateway Integrations",
+    "Jira",
+    "Azure DevOps",
+    "UAT / PROD Validation",
+    "Release Readiness",
+    "Defect Management",
+    "Regression Planning",
+  ];
+
   return (
     <main style={styles.page}>
       <div style={styles.container}>
@@ -171,7 +202,8 @@ export default function App() {
           <h1 style={styles.title}>Jerry O'Riley</h1>
 
           <h2 style={styles.subtitle}>
-            Senior QA Engineer focused on release quality, system reliability, and real-world impact.
+            Senior QA Engineer specializing in release quality, payments systems,
+            API testing, and production risk reduction.
           </h2>
 
           <p style={styles.text}>
@@ -205,6 +237,23 @@ export default function App() {
             <li>Work across teams to align expectations and reduce ambiguity</li>
             <li>Bring product knowledge, release experience, and practical judgment into testing decisions</li>
           </ul>
+        </section>
+
+        <section style={styles.section}>
+          <h2 style={styles.sectionTitle}>Tools & Focus Areas</h2>
+
+          <p style={styles.text}>
+            Practical testing experience across financial systems, integrations, releases,
+            and the tools teams use to ship with confidence.
+          </p>
+
+          <div style={styles.toolGrid}>
+            {tools.map((tool) => (
+              <div key={tool} style={styles.toolPill}>
+                {tool}
+              </div>
+            ))}
+          </div>
         </section>
 
         <section style={styles.section}>
