@@ -1,326 +1,360 @@
+import {
+  ArrowDown,
+  ArrowRight,
+  Bike,
+  Bot,
+  Boxes,
+  BrainCircuit,
+  Car,
+  CheckCircle2,
+  CircuitBoard,
+  Code2,
+  Cpu,
+  Download,
+  ExternalLink,
+  Globe2,
+  Hammer,
+  Mail,
+  MapPin,
+  Menu,
+  Network,
+  Rocket,
+  ShieldCheck,
+  Sparkles,
+  Trees,
+  Wrench,
+  X,
+  Zap,
+} from "lucide-react";
 import { useState } from "react";
+import "./App.css";
 
-export default function App() {
-  const [hoveredCard, setHoveredCard] = useState({ title: null, x: 0, y: 0 });
+const capabilities = [
+  {
+    icon: ShieldCheck,
+    number: "01",
+    title: "Quality Strategy",
+    text: "Building test strategies that reduce risk, expose uncertainty, and improve release confidence.",
+  },
+  {
+    icon: Rocket,
+    number: "02",
+    title: "Release Ownership",
+    text: "Guiding high-impact releases from planning through production validation.",
+  },
+  {
+    icon: Code2,
+    number: "03",
+    title: "Test Automation",
+    text: "Automating repeatable validation across APIs, integrations, and critical user flows.",
+  },
+  {
+    icon: BrainCircuit,
+    number: "04",
+    title: "AI-Assisted Engineering",
+    text: "Using AI to increase coverage, accelerate investigation, and improve engineering velocity.",
+  },
+];
 
-  const styles = {
-    page: {
-      position: "relative",
-      minHeight: "100vh",
-      fontFamily: "Arial, sans-serif",
-      background:
-        "radial-gradient(circle at top left, rgba(56,189,248,0.18), transparent 30%), linear-gradient(135deg, #0f172a, #111827, #1e293b)",
-      color: "#f8fafc",
-      padding: "60px 24px",
-      overflow: "hidden",
-    },
-    container: { maxWidth: "1120px", margin: "0 auto" },
-    hero: {
-      padding: "60px",
-      borderRadius: "30px",
-      background: "rgba(255,255,255,0.07)",
-      border: "1px solid rgba(255,255,255,0.14)",
-      marginBottom: "30px",
-      boxShadow: "0 30px 90px rgba(0,0,0,0.35)",
-    },
-    badge: {
-      display: "inline-block",
-      padding: "9px 14px",
-      borderRadius: "999px",
-      background: "rgba(253,224,71,0.16)",
-      border: "1px solid rgba(253,224,71,0.35)",
-      color: "#fef08a",
-      marginBottom: "18px",
-      fontSize: "14px",
-      fontWeight: "bold",
-    },
-    title: { fontSize: "56px", margin: "0 0 10px" },
-    subtitle: { fontSize: "23px", color: "#7dd3fc", marginBottom: "20px" },
-    text: { fontSize: "18px", lineHeight: "1.7", color: "#cbd5e1" },
+const metrics = [
+  { value: "18+", label: "Years in technology", icon: Cpu },
+  { value: "10K+", label: "Users on supported platforms", icon: Network },
+  { value: "300+", label: "Deployed instances", icon: Boxes },
+  { value: "E2E", label: "Release ownership from requirements to production", icon: Zap },
+];
 
-    grid: {
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-      gap: "22px",
-      marginTop: "25px",
-    },
-    note: {
-      padding: "24px",
-      borderRadius: "18px",
-      minHeight: "150px",
-      color: "#172033",
-      boxShadow: "0 18px 40px rgba(0,0,0,0.28)",
-      transition: "transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease",
-      transform: "rotate(-1deg)",
-      border: "1px solid rgba(255,255,255,0.12)",
-      backdropFilter: "blur(12px)",
-      cursor: "pointer",
-      overflow: "hidden",
-    },
-    noteTitle: {
-      fontSize: "19px",
-      marginBottom: "10px",
-      fontWeight: "800",
-    },
-    noteText: {
-      fontSize: "15px",
-      lineHeight: "1.55",
-      color: "#1e293b",
-    },
+const experience = [
+  {
+    company: "AT&T",
+    years: "2008 — 2020",
+    role: "QA / Defect Management",
+    points: [
+      "Firmware and multi-browser validation",
+      "Automation tasks and requirements analysis",
+      "Defect management and release coordination",
+      "Field training in copper splicing and home installation",
+    ],
+  },
+  {
+    company: "Payroc",
+    years: "2020 — Present",
+    role: "Senior QA Engineer",
+    points: [
+      "Manual and exploratory testing across payment workflows",
+      "API, gateway, merchant, and integration validation",
+      "Release ownership across DEV, UAT, and production",
+      "Automation strategy and repeatable regression coverage",
+      "Requirements analysis and cross-team delivery leadership",
+    ],
+  },
+];
 
-    section: {
-      marginTop: "35px",
-      padding: "32px",
-      borderRadius: "26px",
-      background: "rgba(15,23,42,0.8)",
-      border: "1px solid rgba(255,255,255,0.12)",
-    },
-    sectionTitle: { fontSize: "32px", marginBottom: "16px" },
-    list: { paddingLeft: "20px", lineHeight: "1.75", color: "#cbd5e1" },
-    toolGrid: {
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-      gap: "14px",
-      marginTop: "20px",
-    },
-    toolPill: {
-      padding: "14px 16px",
-      borderRadius: "14px",
-      background: "rgba(255,255,255,0.08)",
-      border: "1px solid rgba(255,255,255,0.14)",
-      color: "#e2e8f0",
-      fontSize: "15px",
-      fontWeight: "700",
-      textAlign: "center",
-    },
-    winGrid: {
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-      gap: "20px",
-      marginTop: "20px",
-    },
-    link: { color: "#7dd3fc", fontWeight: "bold" },
-  };
+const interests = [
+  { icon: Car, title: "Automotive", text: "Building a 1JZ GS300 with an 8HP transmission and an EcoBoost/CD009 240SX, plus competing with a drift team at grassroots events and track days." },
+  { icon: CircuitBoard, title: "Electronics", text: "ESP boards, CAN bus, custom dashboards, sensors, and embedded problem-solving." },
+  { icon: Wrench, title: "Fabrication", text: "Welding, CAD, 3D printing, and building practical solutions that last." },
+  { icon: Hammer, title: "Home + DIY", text: "Woodworking, smart-home tech, networking, and full kitchen, bathroom, and flooring renovations." },
+  { icon: Bike, title: "BMX", text: "Street, park, and dirt riding, plus hands-on work helping build a bike park." },
+  { icon: Trees, title: "Home + Land", text: "Maintaining and improving the property inside and out, from repairs and renovations to landscaping and ongoing outdoor projects." },
+];
 
-  const getCardStyle = (skill) => {
-    const active = hoveredCard.title === skill.title;
-    const rotateX = active ? hoveredCard.y * 18 : 0;
-    const rotateY = active ? hoveredCard.x * 18 : 0;
+const projects = [
+  {
+    id: "P-01",
+    title: "Automotive Builds",
+    text: "A 1JZ-powered Lexus GS300 with an 8HP transmission, plus a 240SX EcoBoost build with a CD009 gearbox.",
+    icon: Car,
+    status: "IN PROGRESS",
+  },
+  {
+    id: "P-02",
+    title: "ESP Dash Display",
+    text: "A custom ESP32 dashboard with CAN integration and real-time telemetry data.",
+    icon: CircuitBoard,
+    status: "PROTOTYPING",
+  },
+  {
+    id: "P-03",
+    title: "Shed / Theater Lab",
+    text: "Designing and building a small multifunctional space from the ground up.",
+    icon: Boxes,
+    status: "BUILDING",
+  },
+  {
+    id: "P-04",
+    title: "Network Lab",
+    text: "Home network design, troubleshooting, segmentation, and constant optimization.",
+    icon: Network,
+    status: "ALWAYS ON",
+  },
+];
 
-    return {
-      ...styles.note,
-      background: `radial-gradient(circle at top left, rgba(255,255,255,0.22), transparent 28%), ${skill.color}`,
-      transform: `perspective(900px) rotate(${skill.rotate}) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
-      boxShadow: active
-        ? "0 35px 110px rgba(15, 23, 42, 0.42)"
-        : "0 18px 40px rgba(0,0,0,0.28)",
-      filter: active ? "saturate(1.05)" : "none",
-    };
-  };
+const navItems = [
+  ["About", "hero"],
+  ["Experience", "journey"],
+  ["Projects", "projects"],
+  ["Beyond QA", "beyond"],
+  ["Contact", "contact"],
+];
 
-  const handleCardMove = (event, title) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = (event.clientX - rect.left - rect.width / 2) / rect.width;
-    const y = (event.clientY - rect.top - rect.height / 2) / rect.height;
-
-    setHoveredCard({ title, x, y });
-  };
-
-  const resetCard = () => setHoveredCard({ title: null, x: 0, y: 0 });
-
-  const skills = [
-    {
-      title: "Release Ownership",
-      text: "Owns release validation, readiness, and production confidence for high-impact systems.",
-      color: "#fde68a",
-      rotate: "-1.5deg",
-    },
-    {
-      title: "Test Planning",
-      text: "Turns unclear requirements into structured, testable, and executable validation paths.",
-      color: "#bbf7d0",
-      rotate: "-0.5deg",
-    },
-    {
-      title: "API & Payments Testing",
-      text: "Deep experience validating APIs, payment flows, gateways, merchant workflows, and integrations.",
-      color: "#fecdd3",
-      rotate: "1.5deg",
-    },
-    {
-      title: "Automation",
-      text: "Focuses automation on high-value, repeatable testing across Dev, UAT, and Production environments.",
-      color: "#ddd6fe",
-      rotate: "-1deg",
-    },
-  ];
-
-  const wins = [
-    {
-      title: "Caught Production Risk Early",
-      text: "Identified legacy code that was sending ACH files from a DEV environment before it reached production.",
-      color: "#fed7aa",
-      rotate: "1deg",
-    },
-    {
-      title: "Data Center Migration QA",
-      text: "Led QA validation across application migrations, helping ensure stable cutovers and release confidence.",
-      color: "#a7f3d0",
-      rotate: "-1deg",
-    },
-    {
-      title: "API Testing From Scratch",
-      text: "Built API testing coverage for an acquired platform, improving integration and payment workflow confidence.",
-      color: "#bae6fd",
-      rotate: "1.3deg",
-    },
-  ];
-
-  const tools = [
-    "API Testing",
-    "Postman",
-    "Swagger / OpenAPI",
-    "SQL Validation",
-    "Payments & ACH",
-    "Gateway Integrations",
-    "Jira",
-    "Azure DevOps",
-    "UAT / PROD Validation",
-    "Release Readiness",
-    "Defect Management",
-    "Regression Planning",
-  ];
-
+function SectionHeading({ number, eyebrow, title, copy }) {
   return (
-    <main style={styles.page}>
-      <div style={styles.container}>
-        <section style={styles.hero} className="hero-section">
-          <div className="hero-glow" aria-hidden="true" />
-          <div className="hero-ring" aria-hidden="true" />
-          <div style={styles.badge}>Senior QA Engineer · Release Quality · FinTech · Telecom</div>
-
-          <h1 style={styles.title}>Jerry O'Riley</h1>
-
-          <h2 style={styles.subtitle}>
-            Senior QA Engineer specializing in release quality, payments systems,
-            API testing, and production risk reduction.
-          </h2>
-
-          <p style={styles.text}>
-            I specialize in owning quality across complex systems, especially where releases,
-            integrations, and production risk matter. I work closely with teams to bring clarity,
-            structure, and confidence to delivery, making sure what goes out actually works the way it should.
-          </p>
-        </section>
-
-        <section style={styles.grid}>
-          {skills.map((skill) => (
-            <div
-              key={skill.title}
-              style={getCardStyle(skill)}
-              className="interactive-card"
-              onMouseMove={(event) => handleCardMove(event, skill.title)}
-              onMouseLeave={resetCard}
-            >
-              <div style={styles.noteTitle}>{skill.title}</div>
-              <div style={styles.noteText}>{skill.text}</div>
-            </div>
-          ))}
-        </section>
-
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>What I Actually Do</h2>
-          <ul style={styles.list}>
-            <li>Take unclear requirements and turn them into testable, structured validation paths</li>
-            <li>Own release readiness and help ensure production deployments are stable</li>
-            <li>Catch issues before they impact customers, data, or revenue</li>
-            <li>Work across teams to align expectations and reduce ambiguity</li>
-            <li>Bring product knowledge, release experience, and practical judgment into testing decisions</li>
-          </ul>
-        </section>
-
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>Tools & Focus Areas</h2>
-
-          <p style={styles.text}>
-            Practical testing experience across financial systems, integrations, releases,
-            and the tools teams use to ship with confidence.
-          </p>
-
-          <div style={styles.toolGrid}>
-            {tools.map((tool) => (
-              <div key={tool} style={styles.toolPill}>
-                {tool}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>Key Wins</h2>
-
-          <div style={styles.winGrid}>
-            {wins.map((win) => (
-              <div
-                key={win.title}
-                style={getCardStyle(win)}
-                className="interactive-card"
-                onMouseMove={(event) => handleCardMove(event, win.title)}
-                onMouseLeave={resetCard}
-              >
-                <div style={styles.noteTitle}>{win.title}</div>
-                <div style={styles.noteText}>{win.text}</div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>Experience</h2>
-
-          <p>
-            <strong>Payroc — Senior QA Engineer / Quality & Delivery Lead</strong>
-          </p>
-          <ul style={styles.list}>
-            <li>Own quality across fintech applications including payments, APIs, gateways, and internal systems</li>
-            <li>Lead release validation, test planning, and production readiness</li>
-            <li>Build automation and API testing coverage across environments</li>
-            <li>Partner with product, development, and business teams to reduce ambiguity and improve release confidence</li>
-          </ul>
-
-          <p>
-            <strong>AT&T — QA / Defect Management</strong>
-          </p>
-          <ul style={styles.list}>
-            <li>Supported QA for a large-scale TV platform across multiple teams</li>
-            <li>Managed defects, coordinated releases, and validated production readiness</li>
-            <li>Built deep experience in enterprise QA, release cycles, and cross-team coordination</li>
-            <li>Worked with teams to understand product behavior, reproduce issues, validate fixes, and keep delivery moving</li>
-          </ul>
-        </section>
-
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>Contact</h2>
-
-          <p style={styles.text}>
-            Open to Senior QA Engineer, Quality Engineering, and QA leadership roles.
-          </p>
-
-          <p>
-            Resume:{" "}
-            <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" style={styles.link}>
-              View / Download
-            </a>
-          </p>
-
-          <p>
-            Email:{" "}
-            <span style={styles.link}>
-              {"jerr" + ".oriley" + "@" + "gmail" + "." + "com"}
-            </span>
-          </p>
-        </section>
+    <header className="section-heading">
+      <span className="section-number">{number}</span>
+      <div>
+        <p className="eyebrow">{eyebrow}</p>
+        <h2>{title}</h2>
+        {copy && <p className="section-copy">{copy}</p>}
       </div>
-    </main>
+    </header>
   );
 }
+
+function App() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const closeMenu = () => setMenuOpen(false);
+
+  return (
+    <div className="site-shell">
+      <a className="skip-link" href="#hero">Skip to content</a>
+
+      <header className="topbar">
+        <a className="brand-mark" href="#hero" onClick={closeMenu} aria-label="Jerry O'Riley home">
+          JO<span className="brand-dot" />
+        </a>
+
+        <nav className={menuOpen ? "nav-links is-open" : "nav-links"} aria-label="Main navigation">
+          {navItems.map(([label, id]) => (
+            <a key={id} href={`#${id}`} onClick={closeMenu}>{label}</a>
+          ))}
+          <a className="nav-resume" href="/resume.pdf" target="_blank" rel="noreferrer" onClick={closeMenu}>
+            Resume <Download size={14} />
+          </a>
+        </nav>
+
+        <button
+          className="menu-button"
+          type="button"
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          {menuOpen ? <X /> : <Menu />}
+        </button>
+      </header>
+
+      <main>
+        <section className="hero-section" id="hero">
+          <div className="hero-copy">
+            <p className="eyebrow hero-kicker"><span /> Senior QA Engineer</p>
+            <h1>Jerry<br />O’Riley</h1>
+            <p className="hero-statement">I bring clarity to complex systems. And build better ways forward.</p>
+            <p className="hero-summary">
+              Quality strategist, automation builder, and practical problem solver working across payments,
+              APIs, complex releases, and the systems behind them.
+            </p>
+            <div className="hero-actions">
+              <a className="button button-primary" href="#journey">View experience <ArrowRight size={17} /></a>
+              <a className="button button-secondary" href="#contact">Contact me <Mail size={17} /></a>
+            </div>
+          </div>
+
+          <div className="hero-system" aria-hidden="true">
+            <div className="system-label label-top">SYS.QA / ACTIVE</div>
+            <div className="orbit orbit-one"><span /></div>
+            <div className="orbit orbit-two"><span /></div>
+            <div className="orbit orbit-three"><span /></div>
+            <div className="system-core"><CheckCircle2 size={30} /></div>
+            <div className="node node-a" />
+            <div className="node node-b" />
+            <div className="node node-c" />
+            <div className="node node-d" />
+            <div className="connector connector-a" />
+            <div className="connector connector-b" />
+            <div className="system-label label-bottom">RELEASE CONFIDENCE: 99.9%</div>
+          </div>
+
+          <a className="scroll-cue" href="#capabilities" aria-label="Scroll to capabilities">
+            <span>Scroll</span><ArrowDown size={16} />
+          </a>
+        </section>
+
+        <section className="content-section" id="capabilities">
+          <SectionHeading
+            number="02"
+            eyebrow="What I do"
+            title="Quality that moves delivery forward."
+            copy="I work where product knowledge, technical testing, and release judgment overlap."
+          />
+          <div className="capability-grid">
+            {capabilities.map(({ icon: Icon, number, title, text }) => (
+              <article className="capability-card" key={title}>
+                <div className="card-topline"><span>{number}</span><Icon size={25} /></div>
+                <h3>{title}</h3>
+                <p>{text}</p>
+                <ArrowRight className="card-arrow" size={18} />
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="content-section metrics-section" id="impact">
+          <SectionHeading number="03" eyebrow="Impact / numbers" title="Experience measured in real systems." />
+          <div className="metrics-grid">
+            {metrics.map(({ value, label, icon: Icon }) => (
+              <article className="metric" key={label}>
+                <Icon size={22} />
+                <strong>{value}</strong>
+                <span>{label}</span>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="content-section journey-section" id="journey">
+          <SectionHeading
+            number="04"
+            eyebrow="Career journey"
+            title="Built through ownership."
+            copy="From large-scale telecom platforms to high-stakes payment systems."
+          />
+          <div className="timeline">
+            {experience.map((job) => (
+              <article className="timeline-card" key={job.company}>
+                <div className="timeline-node" />
+                <div className="timeline-meta"><span>{job.years}</span><span>EMPLOYMENT.LOG</span></div>
+                <h3>{job.company}</h3>
+                <p className="timeline-role">{job.role}</p>
+                <ul>{job.points.map((point) => <li key={point}>{point}</li>)}</ul>
+              </article>
+            ))}
+            <article className="timeline-card next-card">
+              <div className="timeline-node" />
+              <div className="timeline-meta"><span>FOUNDER / OPERATOR</span><span>OWNER-BUILT</span></div>
+              <Sparkles size={30} />
+              <h3>Rough Break LLC</h3>
+              <p>Started and run an independent LLC, owning the work from planning and customer communication through hands-on execution and delivery.</p>
+              <a href="#contact">Built from the ground up <ArrowRight size={15} /></a>
+            </article>
+          </div>
+        </section>
+
+        <section className="content-section beyond-section" id="beyond">
+          <SectionHeading
+            number="05"
+            eyebrow="Beyond QA"
+            title="Always building something."
+            copy="The same curiosity I bring to software follows me into machines, electronics, fabrication, homes, and land."
+          />
+          <div className="interest-strip">
+            {interests.map(({ icon: Icon, title, text }) => (
+              <article className="interest-card" key={title}>
+                <Icon size={30} />
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="content-section projects-section" id="projects">
+          <SectionHeading
+            number="06"
+            eyebrow="Currently building"
+            title="Projects from the workbench."
+            copy="A few active builds where software, hardware, and stubborn persistence meet."
+          />
+          <div className="projects-grid">
+            {projects.map(({ id, title, text, icon: Icon, status }) => (
+              <article className="project-card" key={title}>
+                <div className="project-visual">
+                  <span className="project-id">{id}</span>
+                  <Icon size={58} strokeWidth={1.1} />
+                  <div className="scan-line" />
+                </div>
+                <div className="project-body">
+                  <span className="project-status">{status}</span>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="contact-section" id="contact">
+          <div className="contact-copy">
+            <p className="eyebrow"><span /> Let’s connect</p>
+            <h2>Have a complex system that needs clarity?</h2>
+            <p>I’m open to Senior QA, Quality Engineering, release leadership, and hands-on technical roles.</p>
+            <div className="contact-list">
+              <a href="mailto:jerr.oriley@gmail.com"><Mail size={18} /> jerr.oriley@gmail.com</a>
+              <span><MapPin size={18} /> Chicago area / Remote</span>
+              <a href="/resume.pdf" target="_blank" rel="noreferrer"><Download size={18} /> Download resume</a>
+            </div>
+          </div>
+          <div className="contact-panel">
+            <div className="availability"><span /> AVAILABLE FOR THE RIGHT ROLE</div>
+            <Bot size={42} />
+            <p>Release quality. Production confidence. Better systems.</p>
+            <a className="button button-primary" href="mailto:jerr.oriley@gmail.com">Start a conversation <ArrowRight size={17} /></a>
+            <div className="social-links">
+              <a href="https://github.com/JerryOriley" target="_blank" rel="noreferrer" aria-label="GitHub"><Globe2 size={18} /></a>
+              <a href="/resume.pdf" target="_blank" rel="noreferrer" aria-label="Resume"><Download size={18} /></a>
+              <a href="mailto:jerr.oriley@gmail.com" aria-label="Email"><ExternalLink size={18} /></a>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <span>© 2026 Jerry O’Riley</span>
+        <span>DESIGNED / BUILT / ITERATING</span>
+        <a href="#hero">Back to top <ArrowDown className="up-arrow" size={14} /></a>
+      </footer>
+    </div>
+  );
+}
+
+export default App;
