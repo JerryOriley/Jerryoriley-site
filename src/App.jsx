@@ -26,7 +26,8 @@ import {
   X,
   Zap,
 } from "lucide-react";
-import { useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useState } from "react";
 import "./App.css";
 
 const capabilities = [
@@ -132,10 +133,12 @@ const projects = [
 const navItems = [
   ["About", "hero"],
   ["Experience", "journey"],
-  ["Projects", "projects"],
   ["Beyond QA", "beyond"],
+  ["Projects", "projects"],
   ["Contact", "contact"],
 ];
+
+const sceneIds = ["hero", "capabilities", "impact", "journey", "beyond", "projects", "contact"];
 
 function SectionHeading({ number, eyebrow, title, copy }) {
   return (
@@ -152,21 +155,137 @@ function SectionHeading({ number, eyebrow, title, copy }) {
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [storyMode, setStoryMode] = useState(() => window.matchMedia("(min-width: 1001px)").matches);
+  const [activeScene, setActiveScene] = useState(() => {
+    const hashScene = sceneIds.indexOf(window.location.hash.replace("#", ""));
+    return hashScene >= 0 ? hashScene : 0;
+  });
+  const reduceMotion = useReducedMotion();
 
   const closeMenu = () => setMenuOpen(false);
+  const goToScene = (id) => {
+    const targetIndex = sceneIds.indexOf(id);
+
+    if (targetIndex < 0) return;
+
+    window.history.replaceState(null, "", `#${id}`);
+
+    if (storyMode) {
+      setActiveScene(targetIndex);
+      closeMenu();
+      return;
+    }
+
+    const target = document.getElementById(id);
+    if (!target) return;
+
+    const scenes = Array.from(document.querySelectorAll(".scroll-scene"));
+    const targetTop = scenes
+      .slice(0, targetIndex)
+      .reduce((total, scene) => total + scene.offsetHeight, 0);
+
+    window.scrollTo({
+      top: Math.max(0, targetTop - (targetIndex > 0 ? (window.innerWidth <= 760 ? 62 : 72) : 0)),
+      behavior: reduceMotion ? "auto" : "smooth",
+    });
+    closeMenu();
+  };
+
+  const scrollToScene = (event, id) => {
+    event.preventDefault();
+    goToScene(id);
+  };
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 1001px)");
+    const updateMode = (event) => setStoryMode(event.matches);
+
+    mediaQuery.addEventListener("change", updateMode);
+
+    return () => mediaQuery.removeEventListener("change", updateMode);
+  }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle("story-mode", storyMode);
+    return () => document.body.classList.remove("story-mode");
+  }, [storyMode]);
+
+  useEffect(() => {
+    if (!storyMode) return undefined;
+
+    let lastWheelEvent = 0;
+    let keyLocked = false;
+    let keyTimer;
+    const moveScene = (direction) => {
+      setActiveScene((current) => Math.max(0, Math.min(sceneIds.length - 1, current + direction)));
+    };
+    const handleWheel = (event) => {
+      if (Math.abs(event.deltaY) < 12) return;
+      event.preventDefault();
+      const newGesture = event.timeStamp - lastWheelEvent > 80;
+      lastWheelEvent = event.timeStamp;
+      if (!newGesture) return;
+      moveScene(event.deltaY > 0 ? 1 : -1);
+    };
+    const handleKeyDown = (event) => {
+      const nextKeys = ["ArrowDown", "PageDown", " "];
+      const previousKeys = ["ArrowUp", "PageUp"];
+      if (!nextKeys.includes(event.key) && !previousKeys.includes(event.key)) return;
+      event.preventDefault();
+      if (keyLocked) return;
+      keyLocked = true;
+      moveScene(nextKeys.includes(event.key) ? 1 : -1);
+      window.clearTimeout(keyTimer);
+      keyTimer = window.setTimeout(() => { keyLocked = false; }, 700);
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.clearTimeout(keyTimer);
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [storyMode]);
+
+  useEffect(() => {
+    if (!storyMode) return;
+    window.history.replaceState(null, "", `#${sceneIds[activeScene]}`);
+  }, [activeScene, storyMode]);
+
+  const sceneMotion = reduceMotion
+    ? {}
+    : {
+        initial: { opacity: 0.35, y: 64, scale: 0.99 },
+        whileInView: { opacity: 1, y: 0, scale: 1 },
+        viewport: { amount: 0.1, once: false },
+        transition: { duration: 0.68, ease: [0.22, 1, 0.36, 1] },
+      };
+  const sceneMotionFor = (index) => storyMode
+    ? {
+        initial: false,
+        animate: activeScene === index
+          ? { opacity: 1, y: 0, scale: 1 }
+          : { opacity: 0, y: activeScene > index ? -90 : 90, scale: 0.97 },
+        transition: { duration: reduceMotion ? 0 : 0.56, ease: [0.22, 1, 0.36, 1] },
+        "aria-hidden": activeScene !== index,
+        style: { pointerEvents: activeScene === index ? "auto" : "none" },
+      }
+    : sceneMotion;
 
   return (
     <div className="site-shell">
       <a className="skip-link" href="#hero">Skip to content</a>
 
       <header className="topbar">
-        <a className="brand-mark" href="#hero" onClick={closeMenu} aria-label="Jerry O'Riley home">
+        <a className="brand-mark" href="#hero" onClick={(event) => scrollToScene(event, "hero")} aria-label="Jerry O'Riley home">
           JO<span className="brand-dot" />
         </a>
 
         <nav className={menuOpen ? "nav-links is-open" : "nav-links"} aria-label="Main navigation">
           {navItems.map(([label, id]) => (
-            <a key={id} href={`#${id}`} onClick={closeMenu}>{label}</a>
+            <a key={id} href={`#${id}`} onClick={(event) => scrollToScene(event, id)}>{label}</a>
           ))}
           <a className="nav-resume" href="/resume.pdf" target="_blank" rel="noreferrer" onClick={closeMenu}>
             Resume <Download size={14} />
@@ -184,8 +303,8 @@ function App() {
         </button>
       </header>
 
-      <main>
-        <section className="hero-section" id="hero">
+      <main className={storyMode ? "story-stage" : undefined}>
+        <motion.section className="hero-section scroll-scene" id="hero" {...sceneMotionFor(0)}>
           <div className="hero-copy">
             <p className="eyebrow hero-kicker"><span /> Senior QA Engineer</p>
             <h1>Jerry<br />O’Riley</h1>
@@ -195,8 +314,8 @@ function App() {
               APIs, complex releases, and the systems behind them.
             </p>
             <div className="hero-actions">
-              <a className="button button-primary" href="#journey">View experience <ArrowRight size={17} /></a>
-              <a className="button button-secondary" href="#contact">Contact me <Mail size={17} /></a>
+              <a className="button button-primary" href="#journey" onClick={(event) => scrollToScene(event, "journey")}>View experience <ArrowRight size={17} /></a>
+              <a className="button button-secondary" href="#contact" onClick={(event) => scrollToScene(event, "contact")}>Contact me <Mail size={17} /></a>
             </div>
           </div>
 
@@ -215,12 +334,12 @@ function App() {
             <div className="system-label label-bottom">RELEASE CONFIDENCE: 99.9%</div>
           </div>
 
-          <a className="scroll-cue" href="#capabilities" aria-label="Scroll to capabilities">
+          <a className="scroll-cue" href="#capabilities" onClick={(event) => scrollToScene(event, "capabilities")} aria-label="Scroll to capabilities">
             <span>Scroll</span><ArrowDown size={16} />
           </a>
-        </section>
+        </motion.section>
 
-        <section className="content-section" id="capabilities">
+        <motion.section className="content-section scroll-scene" id="capabilities" {...sceneMotionFor(1)}>
           <SectionHeading
             number="02"
             eyebrow="What I do"
@@ -237,9 +356,9 @@ function App() {
               </article>
             ))}
           </div>
-        </section>
+        </motion.section>
 
-        <section className="content-section metrics-section" id="impact">
+        <motion.section className="content-section metrics-section scroll-scene" id="impact" {...sceneMotionFor(2)}>
           <SectionHeading number="03" eyebrow="Impact / numbers" title="Experience measured in real systems." />
           <div className="metrics-grid">
             {metrics.map(({ value, label, icon: Icon }) => (
@@ -250,9 +369,9 @@ function App() {
               </article>
             ))}
           </div>
-        </section>
+        </motion.section>
 
-        <section className="content-section journey-section" id="journey">
+        <motion.section className="content-section journey-section scroll-scene" id="journey" {...sceneMotionFor(3)}>
           <SectionHeading
             number="04"
             eyebrow="Career journey"
@@ -275,12 +394,12 @@ function App() {
               <Sparkles size={30} />
               <h3>Rough Break LLC</h3>
               <p>Started and run an independent LLC, owning the work from planning and customer communication through hands-on execution and delivery.</p>
-              <a href="#contact">Built from the ground up <ArrowRight size={15} /></a>
+              <a href="#contact" onClick={(event) => scrollToScene(event, "contact")}>Built from the ground up <ArrowRight size={15} /></a>
             </article>
           </div>
-        </section>
+        </motion.section>
 
-        <section className="content-section beyond-section" id="beyond">
+        <motion.section className="content-section beyond-section scroll-scene" id="beyond" {...sceneMotionFor(4)}>
           <SectionHeading
             number="05"
             eyebrow="Beyond QA"
@@ -296,9 +415,9 @@ function App() {
               </article>
             ))}
           </div>
-        </section>
+        </motion.section>
 
-        <section className="content-section projects-section" id="projects">
+        <motion.section className="content-section projects-section scroll-scene" id="projects" {...sceneMotionFor(5)}>
           <SectionHeading
             number="06"
             eyebrow="Currently building"
@@ -321,9 +440,9 @@ function App() {
               </article>
             ))}
           </div>
-        </section>
+        </motion.section>
 
-        <section className="contact-section" id="contact">
+        <motion.section className="contact-section scroll-scene" id="contact" {...sceneMotionFor(6)}>
           <div className="contact-copy">
             <p className="eyebrow"><span /> Let’s connect</p>
             <h2>Have a complex system that needs clarity?</h2>
@@ -345,13 +464,30 @@ function App() {
               <a href="mailto:jerr.oriley@gmail.com" aria-label="Email"><ExternalLink size={18} /></a>
             </div>
           </div>
-        </section>
+        </motion.section>
       </main>
+
+      {storyMode && (
+        <aside className="scene-progress" aria-label="Page sections">
+          {sceneIds.map((id, index) => (
+            <button
+              key={id}
+              type="button"
+              className={activeScene === index ? "is-active" : ""}
+              aria-label={`Go to section ${index + 1}`}
+              aria-current={activeScene === index ? "step" : undefined}
+              onClick={() => goToScene(id)}
+            >
+              <span>{String(index + 1).padStart(2, "0")}</span>
+            </button>
+          ))}
+        </aside>
+      )}
 
       <footer>
         <span>© 2026 Jerry O’Riley</span>
         <span>DESIGNED / BUILT / ITERATING</span>
-        <a href="#hero">Back to top <ArrowDown className="up-arrow" size={14} /></a>
+        <a href="#hero" onClick={(event) => scrollToScene(event, "hero")}>Back to top <ArrowDown className="up-arrow" size={14} /></a>
       </footer>
     </div>
   );
